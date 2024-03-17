@@ -10,7 +10,7 @@ const allActions = {
 };
 
 function handleEditorAction(editorState, text, currentChangeData) {
-  // TOFO: Showld we have the entire logic under another method. This is to update the formatting based on the text
+  // TODO: Showld we have the entire logic under another method. This is to update the formatting based on the text
   // TODO: Move this logic to another function. Pass only text from here and the corresponding line formatter function should return the method
   let actionKey = Object.keys(allActions).find((eachAction) =>
     text.startsWith(eachAction)
