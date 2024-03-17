@@ -1,0 +1,279 @@
+import {
+  Editor,
+  EditorState,
+  Modifier,
+  RichUtils,
+  SelectionState,
+} from "draft-js";
+import { useState } from "react";
+import "./TextArea.css";
+import myKeyBinding from "../control-actions/myKeyBinding";
+import getCurrentLineData from "../control-actions/getCurrentLineData";
+
+function TextArea() {
+  const [editorState, setEditorState] = useState(() =>
+    EditorState.createEmpty()
+  );
+  const [prevBlockKey, setPrevBlockKey] = useState("");
+  const styleMap = {
+    CODE: {
+      backgroundColor: "rgba(0, 0, 0, 0.05)",
+      fontFamily: '"Inconsolata", "Menlo", "Consolas", monospace',
+      fontSize: 16,
+      padding: 2,
+    },
+    RED_TEXT: {
+      color: "red",
+    },
+  };
+
+  // /**
+  //  *
+  //  * @param {EditorState} editorState
+  //  * @param {*} blockKey
+  //  * @param {*} newType
+  //  * @param {*} newText
+  //  * @returns
+  //  */
+  // function updateBlockTypeAndText(editorState, blockKey, newType, newText) {
+  //   const contentState = editorState.getCurrentContent();
+  //   let targetBlock = contentState.getBlockForKey(blockKey);
+
+  //   // Create a selection that targets the entire block
+  //   const targetSelection = SelectionState.createEmpty(blockKey).merge({
+  //     focusOffset: targetBlock.getLength(),
+  //   });
+
+  //   // Change the block's text if newText is provided
+  //   let updatedContentState = contentState;
+  //   if (newText !== null) {
+  //     updatedContentState = Modifier.replaceText(
+  //       updatedContentState,
+  //       targetSelection,
+  //       newText
+  //     );
+  //   }
+
+  //   // Apply the block type change
+  //   const blockMap = updatedContentState.getBlockMap();
+  //   const block = blockMap.get(blockKey);
+  //   const newBlock = block.set("type", newType);
+  //   const newBlockMap = blockMap.set(blockKey, newBlock);
+
+  //   updatedContentState = updatedContentState.merge({
+  //     blockMap: newBlockMap,
+  //     selectionAfter: targetSelection,
+  //   });
+
+  //   return EditorState.push(
+  //     editorState,
+  //     updatedContentState,
+  //     "change-block-type"
+  //   );
+  // }
+
+  // function updateInLineText(
+  //   editorState,
+  //   contentState,
+  //   selection,
+  //   blockType,
+  //   blockText,
+  //   newText
+  // ) {
+  //   const newContentState = Modifier.replaceText(
+  //     contentState,
+  //     selection.merge({
+  //       anchorOffset: 0,
+  //       focusOffset: blockText.length,
+  //     }),
+  //     newText
+  //   );
+
+  //   let newEditorState = EditorState.push(
+  //     editorState,
+  //     newContentState,
+  //     "change-block-type"
+  //   );
+  //   return RichUtils.toggleInlineStyle(newEditorState, blockType);
+  // }
+
+  // // Usage within handleChange function or similar
+  // function handleChange(editorState) {
+  //   const selection = editorState.getSelection();
+  //   const blockKey = selection.getStartKey();
+  //   setPrevBlockKey(blockKey);
+  //   const contentState = editorState.getCurrentContent();
+  //   const block = contentState.getBlockForKey(blockKey);
+  //   const blockText = block.getText();
+  //   const blockType = block.getType();
+
+  //   // Example use case: Toggling header-one type on typing '# '
+  //   if (blockText.startsWith("# ")) {
+  //     console.log(blockKey);
+  //     const newText = blockText.replace("# ", "");
+  //     const newEditorState = updateBlockTypeAndText(
+  //       editorState,
+  //       blockKey,
+  //       "header-one",
+  //       newText
+  //     );
+  //     setEditorState(newEditorState);
+  //   } else if (blockText.startsWith("** ")) {
+  //     console.log(blockKey);
+  //     const newText = blockText.replace("** ", "");
+  //     const newEditorState = updateInLineText(
+  //       editorState,
+  //       contentState,
+  //       selection,
+  //       "RED_TEXT",
+  //       blockText,
+  //       newText
+  //     );
+  //     setEditorState(newEditorState);
+  //   } else if (
+  //     (blockType === "header-one" || blockType === "RED_TEXT") &&
+  //     blockText.trim() === "" &&
+  //     blockKey !== prevBlockKey
+  //   ) {
+  //     console.log(editorState.getSelection().getStartKey());
+  //     // This might catch when you press enter in an empty header block to revert to 'unstyled'
+  //     const newEditorState = updateBlockTypeAndText(
+  //       editorState,
+  //       blockKey,
+  //       "unstyled",
+  //       null
+  //     ); // Keep text as is
+  //     setEditorState(newEditorState);
+  //   } else {
+  //     setEditorState(editorState);
+  //   }
+  // }
+
+  /**
+   *
+   * @param {EditorState} editorState
+   */
+  function handleChange(editorState) {
+    const currentChangeData = getCurrentLineData(editorState);
+
+    // const currentBlock = currentChangeData.currentBlock;
+
+    if (currentChangeData.text.startsWith("# ")) {
+      const newText = currentChangeData.text.replace("# ", "");
+
+      const newContentState = Modifier.replaceText(
+        currentChangeData.contentState,
+        currentChangeData.selectionState.merge({
+          anchorOffset: 0,
+          focusOffset: currentChangeData.text.length,
+        }),
+        newText
+      );
+
+      let newEditorState = EditorState.push(
+        editorState,
+        newContentState,
+        "change-block-type"
+      );
+      newEditorState = RichUtils.toggleBlockType(newEditorState, "header-one");
+      setEditorState(newEditorState);
+    } else if (currentChangeData.text.startsWith("** ")) {
+      const newText = currentChangeData.text.replace("** ", "");
+
+      const newContentState = Modifier.replaceText(
+        currentChangeData.contentState,
+        currentChangeData.selectionState.merge({
+          anchorOffset: 0,
+          focusOffset: currentChangeData.text.length,
+        }),
+        newText
+      );
+
+      let newEditorState = EditorState.push(
+        editorState,
+        newContentState,
+        "change-block-type"
+      );
+      newEditorState = RichUtils.toggleInlineStyle(newEditorState, "RED_TEXT");
+      setEditorState(newEditorState);
+    } else if (currentChangeData.text.trim() === "") {
+      const stylesAtCursor = editorState.getCurrentInlineStyle();
+
+      if (currentChangeData.blockType === "header-one") {
+        let newEditorState = RichUtils.toggleBlockType(editorState, "unstyled");
+        setEditorState(newEditorState);
+      } else if (stylesAtCursor.has("RED_TEXT")) {
+        let newEditorState = RichUtils.toggleInlineStyle(
+          editorState,
+          "RED_TEXT"
+        );
+        setEditorState(newEditorState);
+      }
+      // If the current block is a header and is empty (e.g., after pressing Enter),
+      // revert to default block type for the new block
+    } else {
+      setEditorState(editorState);
+    }
+  }
+
+  // /**
+  //  *
+  //  * @param {EditorState} currentEditorState
+  //  */
+  // function handleChange(currentEditorState) {
+  //   const currentBlockText = getCurrentLineData(currentEditorState);
+
+  //   if (currentBlockText.text.startsWith("# ")) {
+  //     // Remove the "# " and update the block text
+
+  //     const newText = currentBlockText.text.replace("# ", "");
+
+  //     let newContentState = currentBlockText.contentState;
+
+  //     newContentState = Modifier.replaceText(
+  //       newContentState,
+  //       currentBlockText.selectionState.merge({
+  //         anchorOffset: 0,
+  //         focusOffset: currentBlockText.text.length,
+  //       }),
+  //       newText
+  //     );
+
+  //     newContentState = Modifier.setBlockType(newContentState);
+
+  //     // Set the block type to 'header-one'
+  //     let newEditorState = EditorState.push(
+  //       currentEditorState,
+  //       newContentState,
+  //       "change-block-type"
+  //     );
+  //     newEditorState = RichUtils.toggleBlockType(newEditorState, "header-one");
+  //     setEditorState(newEditorState);
+  //   } else {
+  //     setEditorState(currentEditorState);
+  //   }
+  // }
+
+
+  var contentState = editorState.getCurrentContent();
+  if (!contentState.hasText()) {
+    if (contentState.getBlockMap().first().getType() !== "unstyled") {
+      className += " RichEditor-hidePlaceholder";
+    }
+  }
+
+  return (
+    <div className="editorRootContainer">
+      <div className={className}>
+        <Editor
+          customStyleMap={styleMap}
+          editorState={editorState}
+          onChange={handleChange}
+          keyBindingFn={myKeyBinding}
+        />
+      </div>
+    </div>
+  );
+}
+
+export default TextArea;
