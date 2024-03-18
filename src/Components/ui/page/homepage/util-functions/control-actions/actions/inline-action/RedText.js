@@ -4,21 +4,28 @@ import TextActionStrategy from "../../text-action-strategy/TextActionStrategy";
 export default class RedText extends TextActionStrategy {
   execute(editorState, text, currentChangeData) {
     // Implementation of makeRedText
-    const newText = text.replace("** ", "");
+
+    const selection = {
+      anchor: 0,
+      focus: 0,
+    };
+
+    selection.anchor = text.indexOf("** ");
+    selection.focus = selection.anchor + 3;
 
     const newContentState = Modifier.replaceText(
       currentChangeData.contentState,
       currentChangeData.selectionState.merge({
-        anchorOffset: 0,
-        focusOffset: currentChangeData.text.length,
+        anchorOffset: selection.anchor,
+        focusOffset: selection.focus,
       }),
-      newText
+      ""
     );
 
     let newEditorState = EditorState.push(
       editorState,
       newContentState,
-      "change-block-type"
+      "change-inline-style"
     );
     newEditorState = RichUtils.toggleInlineStyle(newEditorState, "RED_TEXT");
     return newEditorState;

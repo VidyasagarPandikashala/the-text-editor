@@ -4,11 +4,13 @@ import "./TextArea.css";
 import retrieveFromLocalStorage from "../../../local-storage/retrieveFromLocalStorage";
 import getCurrentLineData from "../../ui/page/homepage/util-functions/getCurrentLineData";
 import EditorAction from "../../ui/page/homepage/util-functions/control-actions/control-action-handler/EditorAction";
+import { useRef } from "react";
 
 function TextArea({ onEditorStateChange }) {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
+  const editorRef = useRef(null);
   let className = "RichEditor-editor";
 
   const styleMap = {
@@ -22,6 +24,9 @@ function TextArea({ onEditorStateChange }) {
       color: "red",
     },
   };
+  useEffect(() => {
+    editorRef.current.focus();
+  }, []);
 
   /*
    * Here the TexTArea is providing the state of the editorState each is changing its state to the Homepage component.
@@ -88,12 +93,25 @@ function TextArea({ onEditorStateChange }) {
       className += " RichEditor-hidePlaceholder";
     }
   }
+  function blockStyleFn(contentBlock) {
+    const type = contentBlock.getType();
+    if (type === "code-block") {
+      return "myCodeBlockStyle";
+    }
+    // Handle other types or return nothing
+  }
 
   return (
-    <div className="editorRootContainer">
+    <div
+      className="editorRootContainer"
+      onClick={() => editorRef.current.focus()}
+    >
       <div className={className}>
         <Editor
+          ref={editorRef}
+          placeholder="Enter text here"
           customStyleMap={styleMap}
+          blockStyleFn={blockStyleFn}
           editorState={editorState}
           onChange={handleChange}
           keyBindingFn={(e) => handleReturnActionInTextArea(e, editorState)}
