@@ -98,7 +98,6 @@ function TextArea({ onEditorStateChange }) {
     if (type === "code-block") {
       return "myCodeBlockStyle";
     }
-    // Handle other types or return nothing
   }
 
   return (
