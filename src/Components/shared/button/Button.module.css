@@ -1,0 +1,22 @@
+.buttonContainer {
+  background-color: #fbfafa;
+  /* border: 1px solid #ddd; */
+  /* border-top: none; */
+  padding: 8px;
+  border-radius: 0 0 1rem 0;
+  display: flex;
+  justify-content: flex-end;
+}
+.buttonStyle {
+  background-color: black;
+  color: white;
+  padding-inline: 1rem;
+  padding-block: 0.5rem;
+  border-radius: 0.5rem;
+  margin-inline: 9px;
+  cursor: pointer;
+}
+.buttonStyle:hover {
+  background-color: gray;
+  color: white;
+}

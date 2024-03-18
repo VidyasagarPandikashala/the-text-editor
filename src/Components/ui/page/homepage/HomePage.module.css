@@ -1,0 +1,32 @@
+.containerWrapper {
+  width: 100%;
+
+  background-color: antiquewhite;
+}
+.homePageContainer {
+  display: flex;
+  align-items: center;
+  margin-inline: 20px;
+  /* padding: 0; */
+  /* gap: 1rem; */
+  /* margin-inline: 2rem; */
+  /* margin-block: 5rem; */
+  /* background-color: red; */
+  height: calc(100vh - 50px);
+  /* background-color: red; */
+  /* background-color: red; */
+}
+.TextAreaContainer {
+  width: 100%;
+  border-radius: 0 1rem 1rem 0;
+  border: 1px solid #ddd;
+  /* height: 90vh; */
+  /* padding-inline: 2rem; */
+  /* padding-block: 5rem; */
+}
+.headingStyle {
+  text-align: center;
+  font-weight: 800;
+  font-style: normal;
+  letter-spacing: 1ch;
+}

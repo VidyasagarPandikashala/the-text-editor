@@ -1,21 +1,16 @@
 import { Editor, EditorState, getDefaultKeyBinding } from "draft-js";
 import { useEffect, useState } from "react";
 import "./TextArea.css";
+import retrieveFromLocalStorage from "../../../local-storage/retrieveFromLocalStorage";
+import getCurrentLineData from "../../ui/page/homepage/util-functions/getCurrentLineData";
+import EditorAction from "../../ui/page/homepage/util-functions/control-actions/control-action-handler/EditorAction";
 
-import getCurrentLineData from "../util-functions/getCurrentLineData";
-import handleEditorAction from "../control-actions/actionHandler";
-import Button from "../ui/subcomponents/Button";
-
-import retrieveFromLocalStorage from "../../local-storage/retrieveFromLocalStorage";
-import saveToLocalStorage from "../../local-storage/saveToLocalStorage";
-
-function TextArea() {
+function TextArea({ onEditorStateChange }) {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
   let className = "RichEditor-editor";
 
-  // TODO : Move to another file for styles?
   const styleMap = {
     CODE: {
       backgroundColor: "rgba(0, 0, 0, 0.05)",
@@ -27,6 +22,13 @@ function TextArea() {
       color: "red",
     },
   };
+
+  /*
+   * Here the TexTArea is providing the state of the editorState each is changing its state to the Homepage component.
+   **/
+  useEffect(() => {
+    onEditorStateChange(editorState);
+  }, [editorState, onEditorStateChange]);
 
   useEffect(() => {
     const loadEditorContent = () => {
@@ -53,7 +55,8 @@ function TextArea() {
   function handleReturnActionInTextArea(e, editorState) {
     if (e.keyCode == 13) {
       const currentChangeData = getCurrentLineData(editorState);
-      const updatedEditorState = handleEditorAction(
+
+      const updatedEditorState = EditorAction.controlTextAreaAction(
         editorState,
         currentChangeData.text,
         currentChangeData
@@ -70,7 +73,8 @@ function TextArea() {
    */
   function handleChange(editorState) {
     const currentChangeData = getCurrentLineData(editorState);
-    const updatedEditorState = handleEditorAction(
+
+    const updatedEditorState = EditorAction.controlTextAreaAction(
       editorState,
       currentChangeData.text,
       currentChangeData
@@ -78,15 +82,12 @@ function TextArea() {
     setEditorState(updatedEditorState);
   }
 
-  function onSaveEvent() {
-    saveToLocalStorage(editorState);
+  var contentState = editorState.getCurrentContent();
+  if (!contentState.hasText()) {
+    if (contentState.getBlockMap().first().getType() !== "unstyled") {
+      className += " RichEditor-hidePlaceholder";
+    }
   }
-  // var contentState = editorState.getCurrentContent();
-  // if (!contentState.hasText()) {
-  //   if (contentState.getBlockMap().first().getType() !== "unstyled") {
-  //     className += " RichEditor-hidePlaceholder";
-  //   }
-  // }
 
   return (
     <div className="editorRootContainer">
@@ -98,7 +99,6 @@ function TextArea() {
           keyBindingFn={(e) => handleReturnActionInTextArea(e, editorState)}
         />
       </div>
-      <Button onClickEvent={onSaveEvent}></Button>
     </div>
   );
 }

@@ -1,13 +1,16 @@
 .editorRootContainer {
   background: #fff;
-  border: 1px solid #ddd;
+  /* border: 1px solid #ddd; */
   font-family: "Georgia", serif;
   font-size: 14px;
   padding: 15px;
+  border-radius: 0 1rem 0 0;
+  /* border-bottom: none; */
 }
-.RichEditor-editor {
-  border-top: 1px solid #ddd;
+.editorRootContainer .RichEditor-editor {
+  border-top: none;
   cursor: text;
+  height: 600px;
   font-size: 16px;
   margin-top: 10px;
 }

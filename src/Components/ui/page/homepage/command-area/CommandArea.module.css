@@ -1,0 +1,28 @@
+.commandAreaWrapper {
+  /* margin: 0; */
+  /* padding: 0; */
+  width: 500px;
+  height: 700px;
+  /* margin-top: 5rem; */
+  background-color: rgb(167, 167, 167);
+  border-radius: 1rem 0 0 1rem;
+  font-size: small;
+}
+.headingStyle2 {
+  padding: 1rem;
+  color: black;
+}
+li {
+  list-style: none;
+}
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  letter-spacing: 0.25ch;
+  color: whitesmoke;
+}
+.listSpanStyle {
+  color: black;
+  font-weight: 700;
+}
